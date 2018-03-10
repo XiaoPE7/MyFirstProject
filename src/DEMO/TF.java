@@ -8,7 +8,6 @@ import java.awt.event.KeyListener;
 import java.util.Vector;
 
 
-
 public class TF extends JFrame {
     public static void main(String[] args) {
 
@@ -25,23 +24,25 @@ public class TF extends JFrame {
         this.setSize(500, 300);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
+        Thread t2=new Thread(mp);
+        t2.start();
     }
 }
 
 
 //定义一个MY PANEL 用于绘图
-class MyPanle extends JPanel implements KeyListener {
+class MyPanle extends JPanel implements KeyListener, Runnable {
     //定义一个我的坦克
     Me me = null;
     Vector<Enemy> ETS = null;
-    Enemy et=null;
-    int EnSize =3;
+    Enemy et = null;
+    int EnSize = 3;
 
     public MyPanle() {
         me = new Me(10, 200);
-        ETS =new Vector<Enemy>();
-        for (int i=0;i<EnSize;i++){
-            et=new Enemy((i+1)*50,0);
+        ETS = new Vector<Enemy>();
+        for (int i = 0; i < EnSize; i++) {
+            et = new Enemy((i + 1) * 50, 0);
             ETS.add(et);
             et.setColor(0);
             et.setDirect(2);
@@ -55,9 +56,11 @@ class MyPanle extends JPanel implements KeyListener {
         int y = getY();
         me.setColor(1);
         this.drawTank(me.getX(), me.getY(), g, me.getDirect(), me.getColor());
-        for (int i=0;i<ETS.size();i++)
-        {
-            this.drawTank(ETS.get(i).getX(),ETS.get(i).getY(),g,ETS.get(i).getDirect(),ETS.get(i).getColor());
+        if (this.me.bullet != null) {
+            g.draw3DRect(me.bullet.x, me.bullet.y, 1, 1, false);
+        }
+        for (int i = 0; i < ETS.size(); i++) {
+            this.drawTank(ETS.get(i).getX(), ETS.get(i).getY(), g, ETS.get(i).getDirect(), ETS.get(i).getColor());
         }
 
     }
@@ -125,11 +128,25 @@ class MyPanle extends JPanel implements KeyListener {
             this.me.setDirect(3);
             this.me.moveleft();
         }
+        if (e.getKeyCode() == KeyEvent.VK_J) {
+            this.me.shot();
+        }
         repaint();
     }
 
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            repaint();
+        }
     }
 }
 

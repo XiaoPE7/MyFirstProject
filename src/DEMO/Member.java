@@ -53,6 +53,7 @@ class Tank {
         this.y = y;
     }
 
+
     public Tank(int x, int y) {
         this.x = x;
 
@@ -62,9 +63,11 @@ class Tank {
 
 //驾驶的坦克
 class Me extends Tank {
+    Bullet bullet = null;
 
     public Me(int x, int y) {
         super(x, y);
+        bullet = new Bullet(x, y,direct);
     }
 
     public void moveup() {
@@ -82,11 +85,82 @@ class Me extends Tank {
     public void moveright() {
         x += speed;
     }
+
+    public void shot() {
+        switch (this.direct) {
+            case 0:
+                bullet = new Bullet(x + 10, y - 5, 0);
+                break;
+            case 1:
+                bullet = new Bullet(x + 35, y + 10, 1);
+                break;
+            case 2:
+                bullet = new Bullet(x + 10, y + 35, 2);
+                break;
+            case 3:
+                bullet = new Bullet(x - 5, y + 10, 3);
+                break;
+        }
+        Thread t=new Thread(bullet);
+        t.start();
+    }
 }
 
+
 class Enemy extends Tank {
-    public Enemy(int x,int y){
-        super(x,y);
+    public Enemy(int x, int y) {
+        super(x, y);
     }
 
+}
+
+
+class Bullet implements Runnable {
+    int x;
+    int y;
+    int speed = 3;
+    int direct;
+
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public Bullet(int x, int y, int direct) {
+        this.x = x;
+        this.y = y;
+        this.direct = direct;
+    }
+
+
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            switch (direct) {
+                case 0:
+                    y -= speed;
+                    break;
+                case 1:
+                    x += speed;
+                    break;
+                case 2:
+                    y += speed;
+                    break;
+                case 3:
+                    x -= speed;
+                    break;
+            }
+            if (x>400||x<0||y>300||y<0) {
+                break;
+            }
+        }
+    }
 }
