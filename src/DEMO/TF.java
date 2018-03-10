@@ -24,7 +24,7 @@ public class TF extends JFrame {
         this.setSize(500, 300);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-        Thread t2=new Thread(mp);
+        Thread t2 = new Thread(mp);
         t2.start();
     }
 }
@@ -37,6 +37,7 @@ class MyPanle extends JPanel implements KeyListener, Runnable {
     Vector<Enemy> ETS = null;
     Enemy et = null;
     int EnSize = 3;
+
 
     public MyPanle() {
         me = new Me(10, 200);
@@ -55,17 +56,28 @@ class MyPanle extends JPanel implements KeyListener, Runnable {
         int x = getX();
         int y = getY();
         me.setColor(1);
+        me.setSpeed(5);
+        me.bullet.setSpeed(10);
         this.drawTank(me.getX(), me.getY(), g, me.getDirect(), me.getColor());
-        if (this.me.bullet != null) {
-            g.draw3DRect(me.bullet.x, me.bullet.y, 1, 1, false);
+        for (int i = 0; i < me.bullets.size(); i++) {
+            Bullet mybullet = this.me.bullets.get(i);
+            if (mybullet != null && mybullet.isLive ) {
+                g.draw3DRect(mybullet.x, mybullet.y, 1, 1, false);
+            }
+            if (!mybullet.isLive ) {
+                me.bullets.remove(mybullet);
+            }
         }
         for (int i = 0; i < ETS.size(); i++) {
-            this.drawTank(ETS.get(i).getX(), ETS.get(i).getY(), g, ETS.get(i).getDirect(), ETS.get(i).getColor());
+            et = ETS.get(i);
+            if (et.isLive) {
+                this.drawTank(et.x, et.y, g, et.getDirect(), et.getColor());
+            }
         }
 
     }
 
-    public void drawTank(int x, int y, Graphics g, int direct, int type) {
+    private void drawTank(int x, int y, Graphics g, int direct, int type) {
         switch (type) {
             case 0:
                 g.setColor(Color.cyan);
@@ -129,10 +141,13 @@ class MyPanle extends JPanel implements KeyListener, Runnable {
             this.me.moveleft();
         }
         if (e.getKeyCode() == KeyEvent.VK_J) {
-            this.me.shot();
+            if (this.me.bullets.size() <= 5) {
+                this.me.shot();
+            }
         }
         repaint();
     }
+
 
     public void keyReleased(KeyEvent e) {
 
@@ -144,6 +159,17 @@ class MyPanle extends JPanel implements KeyListener, Runnable {
                 Thread.sleep(100);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            for (int i = 0; i < me.bullets.size(); i++) {
+                Bullet b = me.bullets.get(i);
+                if (b.isLive) {
+                    for (int j = 0; j < ETS.size(); j++) {
+                        Enemy et = ETS.get(j);
+                        if (et.isLive) {
+                            et.hittank(b, et);
+                        }
+                    }
+                }
             }
             repaint();
         }

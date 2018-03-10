@@ -1,5 +1,7 @@
 package DEMO;
 
+import java.util.Vector;
+
 //坦克类
 class Tank {
 
@@ -64,11 +66,15 @@ class Tank {
 //驾驶的坦克
 class Me extends Tank {
     Bullet bullet = null;
+    Vector<Bullet> bullets = null;
 
     public Me(int x, int y) {
         super(x, y);
-        bullet = new Bullet(x, y,direct);
+        bullet = new Bullet(x, y, direct);
+        bullets = new Vector<Bullet>();
+
     }
+
 
     public void moveup() {
         y -= speed;
@@ -90,28 +96,59 @@ class Me extends Tank {
         switch (this.direct) {
             case 0:
                 bullet = new Bullet(x + 10, y - 5, 0);
+                bullets.add(bullet);
                 break;
             case 1:
                 bullet = new Bullet(x + 35, y + 10, 1);
+                bullets.add(bullet);
                 break;
             case 2:
                 bullet = new Bullet(x + 10, y + 35, 2);
+                bullets.add(bullet);
                 break;
             case 3:
                 bullet = new Bullet(x - 5, y + 10, 3);
+                bullets.add(bullet);
                 break;
         }
-        Thread t=new Thread(bullet);
+        Thread t = new Thread(bullet);
         t.start();
     }
 }
 
 
-class Enemy extends Tank {
+class Enemy extends Tank implements Runnable {
+    boolean isLive = true;
+
     public Enemy(int x, int y) {
         super(x, y);
     }
 
+    void hittank(Bullet b, Enemy e) {
+        System.out.println("b.x;" + b.x + "b.y" + b.y + "e.x" + e.x + "e.y" + e.y);
+        switch (e.direct) {
+
+            case 0:
+            case 2:
+                if (b.x >=e.x && b.x <= e.x + 20 && b.y >= e.y && b.y <= e.y + 30) {
+                    b.isLive = false;
+                    e.isLive = false;
+                }
+                break;
+            case 1:
+            case 3:
+                if (b.x >= e.x && b.x <= e.x + 30 && b.y >= e.y && b.y <= e.y + 20) {
+                    b.isLive = false;
+                    e.isLive = false;
+                }
+                break;
+        }
+
+    }
+
+    @Override
+    public void run() {
+    }
 }
 
 
@@ -120,7 +157,7 @@ class Bullet implements Runnable {
     int y;
     int speed = 3;
     int direct;
-
+    boolean isLive = true;
 
     public int getSpeed() {
         return speed;
@@ -158,9 +195,11 @@ class Bullet implements Runnable {
                     x -= speed;
                     break;
             }
-            if (x>400||x<0||y>300||y<0) {
+            if (x > 400 || x < 0 || y > 300 || y < 0) {
+                isLive = false;
                 break;
             }
         }
     }
 }
+
