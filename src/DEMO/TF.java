@@ -46,7 +46,8 @@ class MyPanle extends JPanel implements KeyListener, Runnable {
             et = new Enemy((i + 1) * 50, 0);
             ETS.add(et);
             et.setColor(0);
-            et.setDirect(2);
+            Thread t3=new Thread(et);
+            t3.start();
         }
 
     }

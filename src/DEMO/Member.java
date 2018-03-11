@@ -8,7 +8,7 @@ class Tank {
     int x = 0;
     int y = 0;
     int direct = 0;
-    int speed = 1;
+    int speed = 5;
     int color = 1;
 
     public int getColor() {
@@ -119,6 +119,7 @@ class Me extends Tank {
 
 class Enemy extends Tank implements Runnable {
     boolean isLive = true;
+    int speed = 2;
 
     public Enemy(int x, int y) {
         super(x, y);
@@ -130,7 +131,7 @@ class Enemy extends Tank implements Runnable {
 
             case 0:
             case 2:
-                if (b.x >=e.x && b.x <= e.x + 20 && b.y >= e.y && b.y <= e.y + 30) {
+                if (b.x >= e.x && b.x <= e.x + 20 && b.y >= e.y && b.y <= e.y + 30) {
                     b.isLive = false;
                     e.isLive = false;
                 }
@@ -148,6 +149,49 @@ class Enemy extends Tank implements Runnable {
 
     @Override
     public void run() {
+        while (true) {
+            if (x <= 0) {
+                setDirect(1);
+            } else if (x >= 500) {
+                setDirect(3);
+            } else if (y <= 0) {
+                setDirect(2);
+            } else if (y >= 300) {
+                setDirect(4);
+            }
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            switch (direct) {
+                case 0:
+                    for (int i = 0; i < 5; i++) {
+                        y -= speed;
+                    }
+                    break;
+                case 1:
+                    for (int i = 0; i < 5; i++) {
+                        x += speed;
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < 5; i++) {
+                        y += speed;
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < 5; i++) {
+                        x -= speed;
+                    }
+                    break;
+            }
+            this.direct = (int) (Math.random() * 4);
+            if (!this.isLive) {
+                break;
+            }
+        }
+
     }
 }
 
@@ -202,4 +246,5 @@ class Bullet implements Runnable {
         }
     }
 }
+
 
